@@ -26,10 +26,10 @@
 defined('MOODLE_INTERNAL') || die();
 
 $plugin->component = 'qtype_ddmatch';
-$plugin->version = 2025051900;
-$plugin->requires = 2024042208;
+$plugin->version = 2025110300;
+$plugin->requires = 2025040800; // Moodle 5.1 minimum requirement.
 $plugin->maturity = MATURITY_STABLE;
-$plugin->dependencies = array(
-    'qtype_match' => 2022080900,
-);
-$plugin->release = '2.5.4 (Build: 2025051900)';
+$plugin->dependencies = [
+    'qtype_match' => 2025040800,
+];
+$plugin->release = '2.6.0 (Build: 2025110300)';

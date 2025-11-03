@@ -13,7 +13,6 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
-
 /**
  * Question type class for the drag&drop matching question type.
  *
@@ -23,14 +22,9 @@
  * @copyright  2007 DualCube (https://dualcube.com) 
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
-
 defined('MOODLE_INTERNAL') || die();
-
 require_once($CFG->libdir . '/questionlib.php');
 require_once($CFG->dirroot . '/question/engine/lib.php');
-
-
 /**
  * The drag&drop matching question type class.
  *
@@ -40,46 +34,42 @@ class qtype_ddmatch extends question_type {
 
     public function get_question_options($question) {
         global $DB;
-    
-        // Ensure parent initialisation runs first.
         parent::get_question_options($question);
-    
-        // Try to get options row from DB.
-        $options = $DB->get_record('qtype_ddmatch_options', ['questionid' => $question->id]);
-    
-        // If there is no options row, create one with sane defaults and persist it.
-        if (!$options) {
-            $options = new stdClass();
-            $options->questionid = $question->id;
-            $options->shuffleanswers = 0;
-            $options->correctfeedback = '';
-            $options->partiallycorrectfeedback = '';
-            $options->incorrectfeedback = '';
-    
-            // Insert and set the new id property so other code can use it.
-            $options->id = $DB->insert_record('qtype_ddmatch_options', $options);
+        $question->options = $DB->get_record('qtype_ddmatch_options',
+                array('questionid' => $question->id));
+
+        // If options don't exist, create a default options object.
+        if ($question->options === false) {
+            $question->options = new stdClass();
+            $question->options->questionid = $question->id;
+            $question->options->shuffleanswers = 1;
+            $question->options->correctfeedback = '';
+            $question->options->correctfeedbackformat = FORMAT_HTML;
+            $question->options->partiallycorrectfeedback = '';
+            $question->options->partiallycorrectfeedbackformat = FORMAT_HTML;
+            $question->options->incorrectfeedback = '';
+            $question->options->incorrectfeedbackformat = FORMAT_HTML;
+            $question->options->shownumcorrect = 0;
         }
-    
-        $question->options = $options;
-    
-        // subquestions will at least be an array (get_records returns [] when none found).
-        $question->options->subquestions = $DB->get_records(
-            'qtype_ddmatch_subquestions',
-            ['questionid' => $question->id],
-            'id ASC'
-        );
-    
+
+        $question->options->subquestions = $DB->get_records('qtype_ddmatch_subquestions',
+                array('questionid' => $question->id), 'id ASC');
+
+        // Ensure subquestions is always an array, even if empty.
+        if ($question->options->subquestions === false) {
+            $question->options->subquestions = array();
+        }
+
         return true;
-    }    
+    }
 
     public function save_question_options($question) {
         global $DB;
+
         $context = $question->context;
         $result = new stdClass();
-
         $oldsubquestions = $DB->get_records('qtype_ddmatch_subquestions',
                 array('questionid' => $question->id), 'id ASC');
-
         // Insert all the new question & answer pairs.
         foreach ($question->subquestions as $key => $questiontext) {
             if ($questiontext['text'] == '' && trim($question->subanswers[$key]['text']) == '') {
@@ -88,7 +78,6 @@ class qtype_ddmatch extends question_type {
             if ($questiontext['text'] != '' && trim($question->subanswers[$key]['text']) == '') {
                 $result->notice = get_string('nomatchinganswer', 'qtype_match', $questiontext['text']);
             }
-
             // Update an existing subquestion if possible.
             $subquestion = array_shift($oldsubquestions);
             if (!$subquestion) {
@@ -98,17 +87,14 @@ class qtype_ddmatch extends question_type {
                 $subquestion->answertext = '';
                 $subquestion->id = $DB->insert_record('qtype_ddmatch_subquestions', $subquestion);
             }
-
             $subquestion->questiontext = $this->import_or_save_files($questiontext,
                     $context, 'qtype_ddmatch', 'subquestion', $subquestion->id);
             $subquestion->questiontextformat = $questiontext['format'];
             $subquestion->answertext = $this->import_or_save_files($question->subanswers[$key],
                     $context, 'qtype_ddmatch', 'subanswer', $subquestion->id);
             $subquestion->answertextformat = $question->subanswers[$key]['format'];
-
             $DB->update_record('qtype_ddmatch_subquestions', $subquestion);
         }
-
         // Delete old subquestions records.
         $fs = get_file_storage();
         foreach ($oldsubquestions as $oldsub) {
@@ -116,7 +102,6 @@ class qtype_ddmatch extends question_type {
             $fs->delete_area_files($context->id, 'qtype_ddmatch', 'subanswer', $oldsub->id);
             $DB->delete_records('qtype_ddmatch_subquestions', array('id' => $oldsub->id));
         }
-
         // Save the question options.
         $options = $DB->get_record('qtype_ddmatch_options', array('questionid' => $question->id));
         if (!$options) {
@@ -127,17 +112,13 @@ class qtype_ddmatch extends question_type {
             $options->incorrectfeedback = '';
             $options->id = $DB->insert_record('qtype_ddmatch_options', $options);
         }
-
         $options->shuffleanswers = $question->shuffleanswers;
         $options = $this->save_combined_feedback_helper($options, $question, $context, true);
         $DB->update_record('qtype_ddmatch_options', $options);
-
         $this->save_hints($question, true);
-
         if (!empty($result->notice)) {
             return $result;
         }
-
         return true;
     }
 
@@ -149,19 +130,26 @@ class qtype_ddmatch extends question_type {
 
         $question->stems = array();
         $question->choices = array();
+        $question->choiceformat = array();
         $question->right = array();
 
-        foreach ($questiondata->options->subquestions as $matchsub) {
-            $key = array_search($matchsub->answertext, $question->choices);
-            if ($key === false) {
-                $key = $matchsub->id;
-                $question->choices[$key] = $matchsub->answertext;
-            }
+        // Ensure subquestions exists and is iterable.
+        if (!empty($questiondata->options->subquestions) && is_array($questiondata->options->subquestions)) {
+            foreach ($questiondata->options->subquestions as $matchsub) {
+                $key = array_search($matchsub->answertext, $question->choices);
+                if ($key === false) {
+                    $key = $matchsub->id;
+                    $question->choices[$key] = $matchsub->answertext;
+                    // Set the answer text format. Use answertextformat if available, otherwise default to FORMAT_HTML.
+                    $question->choiceformat[$key] = isset($matchsub->answertextformat) ? $matchsub->answertextformat : FORMAT_HTML;
+                }
 
-            if ($matchsub->questiontext !== '') {
-                $question->stems[$matchsub->id] = $matchsub->questiontext;
-                $question->stemformat[$matchsub->id] = $matchsub->questiontextformat;
-                $question->right[$matchsub->id] = $key;
+                // Only add to stems if questiontext is not empty (allows blank subquestions as distractors).
+                if ($matchsub->questiontext !== '') {
+                    $question->stems[$matchsub->id] = $matchsub->questiontext;
+                    $question->stemformat[$matchsub->id] = $matchsub->questiontextformat;
+                    $question->right[$matchsub->id] = $key;
+                }
             }
         }
     }
@@ -194,7 +182,9 @@ class qtype_ddmatch extends question_type {
             $responses = array();
             foreach ($q->choices as $choiceid => $choice) {
                 $stemhtml = $q->html_to_text($stem, $q->stemformat[$stemid]);
-                $choicehtml = $q->html_to_text($choice, $q->choiceformat[$choiceid]);
+                // Use choiceformat if available, otherwise default to FORMAT_HTML.
+                $choiceformat = isset($q->choiceformat[$choiceid]) ? $q->choiceformat[$choiceid] : FORMAT_HTML;
+                $choicehtml = $q->html_to_text($choice, $choiceformat);
 
                 $responses[$choiceid] = new question_possible_response(
                          $stemhtml. ': ' . $choicehtml,

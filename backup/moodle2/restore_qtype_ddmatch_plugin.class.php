@@ -89,11 +89,30 @@ class restore_qtype_ddmatch_plugin extends restore_qtype_plugin {
     public static function convert_backup_to_questiondata(array $backupdata): \stdClass {
         $questiondata = parent::convert_backup_to_questiondata($backupdata);
 
-        $questiondata->options = (object) $backupdata["plugin_qtype_ddmatch_question"]['matchoptions'][0];
-        $questiondata->options->subquestions = array_map(
-            fn($match) => (object) $match,
-            $backupdata["plugin_qtype_ddmatch_question"]['matches']['match'] ?? [],
-        );
+        // Check if the plugin data exists in the backup.
+        if (isset($backupdata["plugin_qtype_ddmatch_question"])) {
+            // Safely get matchoptions, with fallback to empty object.
+            if (isset($backupdata["plugin_qtype_ddmatch_question"]['matchoptions'][0])) {
+                $questiondata->options = (object) $backupdata["plugin_qtype_ddmatch_question"]['matchoptions'][0];
+            } else {
+                $questiondata->options = new \stdClass();
+            }
+
+            // Safely get subquestions/matches.
+            $matches = [];
+            if (isset($backupdata["plugin_qtype_ddmatch_question"]['matches']['match'])) {
+                $matches = $backupdata["plugin_qtype_ddmatch_question"]['matches']['match'];
+            }
+
+            $questiondata->options->subquestions = array_map(
+                fn($match) => (object) $match,
+                $matches
+            );
+        } else {
+            // If plugin data is missing, create default options structure.
+            $questiondata->options = new \stdClass();
+            $questiondata->options->subquestions = [];
+        }
 
         return $questiondata;
     }
