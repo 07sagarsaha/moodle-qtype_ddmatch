@@ -18,9 +18,9 @@
  * Drag and drop matching question type upgrade code.
  *
  * @package    qtype_ddmatch
- * 
+ *
  * @author DualCube <admin@dualcube.com>
- * @copyright  2007 DualCube (https://dualcube.com) 
+ * @copyright  2007 DualCube (https://dualcube.com)
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -328,7 +328,7 @@ function xmldb_qtype_ddmatch_upgrade($oldversion) {
         // Record that qtype_ddmatch savepoint was reached.
         upgrade_plugin_savepoint(true, 2013062409, 'qtype', 'ddmatch');
     }
-    
+
     if ($oldversion < 2019040400) {
         $table = new xmldb_table('qtype_ddmatch_subquestions');
 

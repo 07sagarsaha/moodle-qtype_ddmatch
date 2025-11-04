@@ -18,9 +18,9 @@
  * Drag-and-drop matching question type classe.
  *
  * @package    qtype_ddmatch
- * 
+ *
  * @author DualCube <admin@dualcube.com>
- * @copyright  2007 DualCube (https://dualcube.com) 
+ * @copyright  2007 DualCube (https://dualcube.com)
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -34,11 +34,20 @@ require_once($CFG->dirroot . '/question/type/match/question.php');
  * Based on core matching question.
  *
  * @author DualCube <admin@dualcube.com>
- * @copyright  2007 DualCube (https://dualcube.com) 
+ * @copyright  2007 DualCube (https://dualcube.com)
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class qtype_ddmatch_question extends qtype_match_question {
 
+    /** Arrays describing the question instance (declared to avoid PHP dynamic property deprecation). */
+    public $stems = [];
+    public $stemformat = [];
+    public $stemorder = [];
+    public $choices = [];
+    public $choiceformat = [];
+    public $choiceorder = [];
+    public $right = [];
+    public $shufflestems = 0;
     public function get_question_summary() {
         $question = $this->html_to_text($this->questiontext, $this->questiontextformat);
 

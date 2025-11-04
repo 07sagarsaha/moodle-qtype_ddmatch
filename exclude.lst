@@ -2,16 +2,11 @@ ddmatch/.git/*
 ddmatch/.github/*
 ddmatch/composer.lock
 ddmatch/composer.json
-ddmatch/log.txt
-ddmatch/phpcs.xml
 ddmatch/.gitignore
 ddmatch/package.json
 ddmatch/package-lock.json
 ddmatch/vendor/*
 ddmatch/node_modules/*
 ddmatch/phpunit.xml
-ddmatch/tests/*
 ddmatch/release/*
-ddmatch/error.log
 ddmatch/Gruntfile.js
-ddmatch/scripts

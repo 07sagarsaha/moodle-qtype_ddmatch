@@ -18,16 +18,16 @@
  * Serve question type files
  *
  * @package qtype_ddmatch
- * 
+ *
  * @author DualCube <admin@dualcube.com>
- * @copyright  2007 DualCube (https://dualcube.com) 
+ * @copyright  2007 DualCube (https://dualcube.com)
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * function for renderening question file 
+ * function for renderening question file
  */
 function qtype_ddmatch_pluginfile($course, $cm, $context, $filearea, $args, $forcedownload, array $options=array()) {
     global $CFG;

@@ -54,8 +54,7 @@ jobs:
 
       - name: Clean Extra Files from Plugin
         run: |
-          rm -rf ddmatch/.git ddmatch/.github ddmatch/node_modules ddmatch/tests ddmatch/phpunit.xml ddmatch/vendor
-          rm -f ddmatch/composer.* ddmatch/package*.json ddmatch/webpack.config.js ddmatch/.zipignore
+          rm -rf $(cat inactive_user_cleanup/exclude.lst | tr '\n' ' ')
 
       - name: Install moodle-plugin-ci tooling
         run: |
