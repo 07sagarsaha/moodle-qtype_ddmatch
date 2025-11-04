@@ -15,22 +15,45 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Serve question type files
+ * Serve question type files.
  *
- * @package qtype_ddmatch
- *
- * @author DualCube <admin@dualcube.com>
- * @copyright  2007 DualCube (https://dualcube.com)
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package   qtype_ddmatch
+ * @category  files
+ * @copyright 2007 DualCube
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
-defined('MOODLE_INTERNAL') || die();
 
 /**
- * function for renderening question file
+ * Serves question files for the Drag-and-Drop Matching question type.
+ *
+ * @param stdClass $course The course object.
+ * @param stdClass $cm The course module object.
+ * @param context  $context The context.
+ * @param string   $filearea The file area.
+ * @param array    $args Additional arguments.
+ * @param bool     $forcedownload Whether to force the download.
+ * @param array    $options Additional options.
+ * @return void
  */
-function qtype_ddmatch_pluginfile($course, $cm, $context, $filearea, $args, $forcedownload, array $options=array()) {
+function qtype_ddmatch_pluginfile(
+    $course,
+    $cm,
+    $context,
+    $filearea,
+    $args,
+    $forcedownload,
+    array $options = []
+) {
     global $CFG;
     require_once($CFG->libdir . '/questionlib.php');
-    question_pluginfile($course, $context, 'qtype_ddmatch', $filearea, $args, $forcedownload, $options);
+
+    question_pluginfile(
+        $course,
+        $context,
+        'qtype_ddmatch',
+        $filearea,
+        $args,
+        $forcedownload,
+        $options
+    );
 }

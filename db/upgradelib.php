@@ -36,17 +36,51 @@ defined('MOODLE_INTERNAL') || die();
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class qtype_ddmatch_qe2_attempt_updater extends question_qtype_attempt_updater {
+    /**
+     * The list of stem texts for the question.
+     * @var array
+     */
     protected $stems;
+
+    /**
+     * The list of possible choices for matching.
+     * @var array
+     */
     protected $choices;
+
+    /**
+     * Mapping of correct answers (stem ID → choice ID).
+     * @var array
+     */
     protected $right;
+
+    /**
+     * Order of stems presented to the student.
+     * @var array
+     */
     protected $stemorder;
+
+    /**
+     * Order of choices presented to the student.
+     * @var array
+     */
     protected $choiceorder;
+
+    /**
+     * Flipped mapping of choice order for quick lookup.
+     * @var array
+     */
     protected $flippedchoiceorder;
 
+    /**
+     * Returns a text summary of the question including stems and choices.
+     *
+     * @return string Summary of the question text.
+     */
     public function question_summary() {
-        $this->stems = array();
-        $this->choices = array();
-        $this->right = array();
+        $this->stems = [];
+        $this->choices = [];
+        $this->right = [];
 
         foreach ($this->question->options->subquestions as $matchsub) {
             $ans = $matchsub->answertext;
@@ -65,36 +99,58 @@ class qtype_ddmatch_qe2_attempt_updater extends question_qtype_attempt_updater {
         return $this->to_text($this->question->questiontext) . ' {' .
                 implode('; ', $this->stems) . '} -> {' . implode('; ', $this->choices) . '}';
     }
-
+    /**
+     * Returns the correctly matched answer summary for the question.
+     *
+     * @return string The correct answer mapping (stem → choice).
+     */
     public function right_answer() {
-        $answer = array();
+        $answer = [];
         foreach ($this->stems as $key => $stem) {
             $answer[$stem] = $this->choices[$this->right[$key]];
         }
         return $this->make_summary($answer);
     }
 
+    /**
+     * Breaks the stored answer string into an associative array.
+     *
+     * @param string $answer The raw answer string from attempt data.
+     * @return array An array mapping stem IDs to selected choice IDs.
+     */
     protected function explode_answer($answer) {
         if (!$answer) {
-            return array();
+            return [];
         }
         $bits = explode(',', $answer);
-        $selections = array();
+        $selections = [];
         foreach ($bits as $bit) {
-            list($stem, $choice) = explode('-', $bit);
+            [$stem, $choice] = explode('-', $bit);
             $selections[$stem] = $choice;
         }
         return $selections;
     }
 
+    /**
+     * Builds a summary string from stem-choice pairs.
+     *
+     * @param array $pairs Array of stem → answer text.
+     * @return string Formatted summary.
+     */
     protected function make_summary($pairs) {
-        $bits = array();
+        $bits = [];
         foreach ($pairs as $stem => $answer) {
             $bits[] = $stem . ' -> ' . $answer;
         }
         return implode('; ', $bits);
     }
 
+    /**
+     * Finds the internal choice ID for a given choice code.
+     *
+     * @param string|int $choice The choice code to look up.
+     * @return int|null The matching choice ID, or null if not found.
+     */
     protected function lookup_choice($choice) {
         foreach ($this->question->options->subquestions as $matchsub) {
             if ($matchsub->code == $choice) {
@@ -108,13 +164,19 @@ class qtype_ddmatch_qe2_attempt_updater extends question_qtype_attempt_updater {
         return null;
     }
 
+    /**
+     * Builds a summary of a student's response for reporting or review.
+     *
+     * @param object $state The attempt state object.
+     * @return string|null Human-readable summary of the response.
+     */
     public function response_summary($state) {
         $choices = $this->explode_answer($state->answer);
         if (empty($choices)) {
             return null;
         }
 
-        $pairs = array();
+        $pairs = [];
         foreach ($choices as $stemid => $choicekey) {
             if (array_key_exists($stemid, $this->stems) && $choices[$stemid]) {
                 $choiceid = $this->lookup_choice($choicekey);
@@ -136,6 +198,12 @@ class qtype_ddmatch_qe2_attempt_updater extends question_qtype_attempt_updater {
         }
     }
 
+    /**
+     * Checks whether the student has provided any response.
+     *
+     * @param object $state The current attempt state.
+     * @return bool True if any choice was selected, false otherwise.
+     */
     public function was_answered($state) {
         $choices = $this->explode_answer($state->answer);
         foreach ($choices as $choice) {
@@ -146,6 +214,13 @@ class qtype_ddmatch_qe2_attempt_updater extends question_qtype_attempt_updater {
         return false;
     }
 
+    /**
+     * Prepares and stores stem and choice order data for the first attempt step.
+     *
+     * @param object $state The current question state.
+     * @param array  $data  Reference to the step data array to populate.
+     * @return void
+     */
     public function set_first_step_data_elements($state, &$data) {
         $choices = $this->explode_answer($state->answer);
         foreach ($choices as $key => $notused) {
@@ -157,12 +232,25 @@ class qtype_ddmatch_qe2_attempt_updater extends question_qtype_attempt_updater {
         $this->choiceorder = array_keys($this->choices);
         shuffle($this->choiceorder);
         $this->flippedchoiceorder = array_combine(
-                array_values($this->choiceorder), array_keys($this->choiceorder));
+            array_values($this->choiceorder),
+            array_keys($this->choiceorder)
+        );
 
         $data['_stemorder'] = implode(',', $this->stemorder);
         $data['_choiceorder'] = implode(',', $this->choiceorder);
     }
 
+    /**
+     * Supplies missing data for the first question attempt step.
+     *
+     * This method is expected to populate default values for stem and choice order
+     * if they are not already provided in the first step of the question attempt.
+     * Currently, this function throws a coding exception indicating it has not been tested.
+     *
+     * @param array $data The step data array, passed by reference.
+     * @return void
+     * @throws coding_exception If the method is called (not yet implemented/tested).
+     */
     public function supply_missing_first_step_data(&$data) {
         throw new coding_exception('qtype_ddmatch_updater::supply_missing_first_step_data ' .
                 'not tested');
@@ -170,6 +258,17 @@ class qtype_ddmatch_qe2_attempt_updater extends question_qtype_attempt_updater {
         $data['_choiceorder'] = shuffle(array_keys($this->choices));
     }
 
+    /**
+     * Sets the response data elements for a given question attempt step.
+     *
+     * This function prepares the response data for each stem in the question based on
+     * the student's selected choices. It maps each stem to the corresponding choice
+     * index within the flipped choice order array.
+     *
+     * @param object $state The current question attempt state containing the student's answer.
+     * @param array $data   The data array that will be populated with subquestion responses by reference.
+     * @return void
+     */
     public function set_data_elements_for_step($state, &$data) {
         $choices = $this->explode_answer($state->answer);
 

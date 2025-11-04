@@ -13,6 +13,7 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
 /**
  * Question type class for the drag&drop matching question type.
  *
@@ -31,12 +32,19 @@ require_once($CFG->dirroot . '/question/engine/lib.php');
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class qtype_ddmatch extends question_type {
-
+    /**
+     * Get question options from the database.
+     *
+     * @param stdClass $question The question object.
+     * @return bool True on success.
+     */
     public function get_question_options($question) {
         global $DB;
         parent::get_question_options($question);
-        $question->options = $DB->get_record('qtype_ddmatch_options',
-                array('questionid' => $question->id));
+        $question->options = $DB->get_record(
+            'qtype_ddmatch_options',
+            ['questionid' => $question->id]
+        );        
 
         // If options don't exist, create a default options object.
         if ($question->options === false) {
@@ -53,11 +61,11 @@ class qtype_ddmatch extends question_type {
         }
 
         $question->options->subquestions = $DB->get_records('qtype_ddmatch_subquestions',
-                array('questionid' => $question->id), 'id ASC');
+            ['questionid' => $question->id], 'id ASC');
 
         // Ensure subquestions is always an array, even if empty.
         if ($question->options->subquestions === false) {
-            $question->options->subquestions = array();
+            $question->options->subquestions = [];
         }
 
         return true;
@@ -69,7 +77,7 @@ class qtype_ddmatch extends question_type {
         $context = $question->context;
         $result = new stdClass();
         $oldsubquestions = $DB->get_records('qtype_ddmatch_subquestions',
-                array('questionid' => $question->id), 'id ASC');
+            ['questionid' => $question->id], 'id ASC');
         // Insert all the new question & answer pairs.
         foreach ($question->subquestions as $key => $questiontext) {
             if ($questiontext['text'] == '' && trim($question->subanswers[$key]['text']) == '') {
@@ -100,10 +108,14 @@ class qtype_ddmatch extends question_type {
         foreach ($oldsubquestions as $oldsub) {
             $fs->delete_area_files($context->id, 'qtype_ddmatch', 'subquestion', $oldsub->id);
             $fs->delete_area_files($context->id, 'qtype_ddmatch', 'subanswer', $oldsub->id);
-            $DB->delete_records('qtype_ddmatch_subquestions', array('id' => $oldsub->id));
+            $DB->delete_records('qtype_ddmatch_subquestions', ['id' => $oldsub->id]);
         }
         // Save the question options.
-        $options = $DB->get_record('qtype_ddmatch_options', array('questionid' => $question->id));
+        $options = $DB->get_record(
+            'qtype_ddmatch_options',
+            ['questionid' => $question->id]
+        );
+        
         if (!$options) {
             $options = new stdClass();
             $options->questionid = $question->id;
@@ -128,10 +140,10 @@ class qtype_ddmatch extends question_type {
         $question->shufflestems = $questiondata->options->shuffleanswers;
         $this->initialise_combined_feedback($question, $questiondata, true);
 
-        $question->stems = array();
-        $question->choices = array();
-        $question->choiceformat = array();
-        $question->right = array();
+        $question->stems = [];
+        $question->choices = [];
+        $question->choiceformat = [];
+        $question->right = [];
 
         // Ensure subquestions exists and is iterable.
         if (!empty($questiondata->options->subquestions) && is_array($questiondata->options->subquestions)) {
@@ -161,8 +173,8 @@ class qtype_ddmatch extends question_type {
     public function delete_question($questionid, $contextid) {
         global $DB;
 
-        $DB->delete_records('qtype_ddmatch_options', array('questionid' => $questionid));
-        $DB->delete_records('qtype_ddmatch_subquestions', array('questionid' => $questionid));
+        $DB->delete_records('qtype_ddmatch_options', ['questionid' => $questionid]);
+        $DB->delete_records('qtype_ddmatch_subquestions', ['questionid' => $questionid]);
 
         parent::delete_question($questionid, $contextid);
     }
@@ -173,13 +185,12 @@ class qtype_ddmatch extends question_type {
     }
 
     public function get_possible_responses($questiondata) {
-        $subqs = array();
+        $subqs = [];
 
         $q = $this->make_question($questiondata);
 
         foreach ($q->stems as $stemid => $stem) {
-
-            $responses = array();
+            $responses = [];
             foreach ($q->choices as $choiceid => $choice) {
                 $stemhtml = $q->html_to_text($stem, $q->stemformat[$stemid]);
                 // Use choiceformat if available, otherwise default to FORMAT_HTML.
@@ -187,7 +198,7 @@ class qtype_ddmatch extends question_type {
                 $choicehtml = $q->html_to_text($choice, $choiceformat);
 
                 $responses[$choiceid] = new question_possible_response(
-                         $stemhtml. ': ' . $choicehtml,
+                    $stemhtml . ': ' . $choicehtml,
                         ($choiceid == $q->right[$stemid]) / count($q->stems));
             }
             $responses[null] = question_possible_response::no_response();
@@ -205,7 +216,7 @@ class qtype_ddmatch extends question_type {
         parent::move_files($questionid, $oldcontextid, $newcontextid);
 
         $subquestionids = $DB->get_records_menu('qtype_ddmatch_subquestions',
-                array('questionid' => $questionid), 'id', 'id,1');
+            ['questionid' => $questionid], 'id', 'id,1');
         foreach ($subquestionids as $subquestionid => $notused) {
             $fs->move_area_files_to_new_context($oldcontextid,
                     $newcontextid, 'qtype_ddmatch', 'subquestion', $subquestionid);
@@ -224,7 +235,7 @@ class qtype_ddmatch extends question_type {
         parent::delete_files($questionid, $contextid);
 
         $subquestionids = $DB->get_records_menu('qtype_ddmatch_subquestions',
-                array('questionid' => $questionid), 'id', 'id,1');
+            ['questionid' => $questionid], 'id', 'id,1');
         foreach ($subquestionids as $subquestionid => $notused) {
             $fs->delete_area_files($contextid, 'qtype_ddmatch', 'subquestion', $subquestionid);
             $fs->delete_area_files($contextid, 'qtype_ddmatch', 'subanswer', $subquestionid);
@@ -285,18 +296,18 @@ class qtype_ddmatch extends question_type {
             // Header parts particular to ddmatch qtype.
             $fromform->qtype = $this->name();
             $fromform->shuffleanswers = $format->trans_single($format->getpath($xml,
-                    array('#', 'shuffleanswers', 0, '#'), 1));
+                ['#', 'shuffleanswers', 0, '#'], 1));
 
             // Run through subquestions.
-            $fromform->subquestions = array();
-            $fromform->subanswers = array();
+            $fromform->subquestions = [];
+            $fromform->subanswers = [];
             foreach ($xml['#']['subquestion'] as $subqxml) {
                 $fromform->subquestions[] = $format->import_text_with_files($subqxml,
-                        array(), '', $format->get_format($fromform->questiontextformat));
+                    [], '', $format->get_format($fromform->questiontextformat));
 
-                $answers = $format->getpath($subqxml, array('#', 'answer', 0), array());
+                $answers = $format->getpath($subqxml, ['#', 'answer', 0], []);
                 $fromform->subanswers[] = $format->import_text_with_files($answers,
-                        array(), '', $format->get_format($fromform->questiontextformat));
+                    [], '', $format->get_format($fromform->questiontextformat));
             }
 
             $format->import_combined_feedback($fromform, $xml, true);

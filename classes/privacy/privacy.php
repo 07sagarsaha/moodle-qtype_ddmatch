@@ -25,8 +25,6 @@
 
 namespace qtype_ddmatch\privacy;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Privacy Subsystem implementation for format_tabtopics.
  *
