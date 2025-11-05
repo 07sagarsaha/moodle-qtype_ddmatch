@@ -54,7 +54,7 @@ jobs:
 
       - name: Clean Extra Files from Plugin
         run: |
-          rm -rf $(cat inactive_user_cleanup/exclude.lst | tr '\n' ' ')
+          rm -rf $(cat ddmatch/exclude.lst | tr '\n' ' ')
 
       - name: Install moodle-plugin-ci tooling
         run: |
