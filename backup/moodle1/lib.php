@@ -30,7 +30,6 @@
  * Matching question type conversion handler.
  */
 class moodle1_qtype_ddmatch_handler extends moodle1_qtype_handler {
-
     /**
      * Returns the list of subpaths within the ddmatch question XML.
      *

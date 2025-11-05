@@ -37,7 +37,6 @@ require_once($CFG->dirroot . '/question/type/match/question.php');
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class qtype_ddmatch_question extends qtype_match_question {
-
     /** @var array List of question stems. */
     public $stems = [];
 
@@ -122,25 +121,24 @@ class qtype_ddmatch_question extends qtype_match_question {
         if ($component === 'qtype_ddmatch' && $filearea === 'subquestion') {
             $subqid = reset($args);
             return array_key_exists($subqid, $this->stems);
-
         } else if ($component === 'qtype_ddmatch' && $filearea === 'subanswer') {
             $subqid = reset($args);
             return array_key_exists($subqid, $this->choices);
-
-        } else if ($component === 'question' && in_array(
-            $filearea,
-            ['correctfeedback', 'partiallycorrectfeedback', 'incorrectfeedback'],
-            true
-        )) {
+        } else if (
+            $component === 'question'
+            && in_array(
+                $filearea,
+                ['correctfeedback', 'partiallycorrectfeedback', 'incorrectfeedback'],
+                true
+            )
+        ) {
             return $this->check_combined_feedback_file_access($qa, $options, $filearea);
-
         } else if ($component === 'question' && $filearea === 'hint') {
             return $this->check_hint_file_access($qa, $options, $args);
-
         } else {
             return parent::check_file_access($qa, $options, $component, $filearea, $args, $forcedownload);
         }
-    }
+    }    
 
     /**
      * Returns the field name for a given stem key.

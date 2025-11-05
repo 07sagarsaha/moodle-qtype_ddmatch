@@ -1,5 +1,5 @@
 <?php
-// This file is part of Moodle - http://moodle.org/
+// This file is part of Moodle - http://moodle.org/.
 //
 // Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -18,29 +18,36 @@
  * Defines the editing form for the drag&drop match question type.
  *
  * @package    qtype_ddmatch
- * @author DualCube <admin@dualcube.com>
+ * @author     DualCube <admin@dualcube.com>
  * @copyright  2007 DualCube (https://dualcube.com)
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
-defined('MOODLE_INTERNAL') || die();
 
 /**
  * Drag&drop match question type editing form definition.
  *
- * @author DualCube <admin@dualcube.com>
+ * @author     DualCube <admin@dualcube.com>
  * @copyright  2007 DualCube (https://dualcube.com)
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class qtype_ddmatch_edit_form extends question_edit_form {
-
+    /**
+     * Returns the form fields for each question-answer pair.
+     *
+     * @param MoodleQuickForm $mform The form being built.
+     * @param string $label The label for the question.
+     * @param array $gradeoptions Available grade options.
+     * @param array $repeatedoptions Reference to repeated options.
+     * @param string $answersoption Name of the answers option.
+     * @return array Array of repeated elements.
+     */
     protected function get_per_answer_fields(
         $mform,
         $label,
         $gradeoptions,
         &$repeatedoptions,
         &$answersoption
-        ) {
+    ) {
         $mform->addElement('static', 'answersinstruct',
                 get_string('availablechoices', 'qtype_match'),
                 get_string('filloutthreeqsandtwoas', 'qtype_match'));
@@ -134,10 +141,10 @@ class qtype_ddmatch_edit_form extends question_edit_form {
             $draftid = file_get_submitted_draft_itemid('subanswers[' . $key . ']');
             $question->subanswers[$key] = [];
             $question->subanswers[$key]['text'] = file_prepare_draft_area(
-                $draftid,           // Draftid.
+                $draftid, // Draft ID.
                 $this->context->id, // Context.
-                'qtype_ddmatch',      // Component.
-                'subanswer',      // Filarea.
+                'qtype_ddmatch', // Component.
+                'subanswer', // Filarea.
                 !empty($subquestion->id) ? (int) $subquestion->id : null, // itemid
                 $this->fileoptions, // Options.
                 $subquestion->answertext // Text.

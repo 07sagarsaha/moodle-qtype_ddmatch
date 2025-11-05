@@ -20,8 +20,11 @@
  * This function performs database schema and data upgrades for the qtype_ddmatch
  * plugin whenever its version number increases.
  *
- * @param int $oldversion The version number of the plugin currently installed.
- * @return bool Always returns true if the upgrade succeeds.
+ * @package    qtype_ddmatch
+ *
+ * @author DualCube <admin@dualcube.com>
+ * @copyright  2007 DualCube (https://dualcube.com)
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 function xmldb_qtype_ddmatch_upgrade($oldversion) {
     global $CFG, $DB;

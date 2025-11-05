@@ -25,8 +25,6 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Provides the information to back up ddmatch questions.
  *
@@ -34,7 +32,6 @@ defined('MOODLE_INTERNAL') || die();
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class backup_qtype_ddmatch_plugin extends backup_qtype_plugin {
-
     /**
      * Defines the structure for the ddmatch question plugin during backup.
      *

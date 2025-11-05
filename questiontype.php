@@ -44,7 +44,7 @@ class qtype_ddmatch extends question_type {
         $question->options = $DB->get_record(
             'qtype_ddmatch_options',
             ['questionid' => $question->id]
-        );        
+        );
 
         // If options don't exist, create a default options object.
         if ($question->options === false) {
@@ -60,8 +60,11 @@ class qtype_ddmatch extends question_type {
             $question->options->shownumcorrect = 0;
         }
 
-        $question->options->subquestions = $DB->get_records('qtype_ddmatch_subquestions',
-            ['questionid' => $question->id], 'id ASC');
+        $question->options->subquestions = $DB->get_record(
+            'qtype_ddmatch_options',
+            ['questionid' => $question->id],
+            'id ASC'
+        );
 
         // Ensure subquestions is always an array, even if empty.
         if ($question->options->subquestions === false) {
@@ -71,6 +74,12 @@ class qtype_ddmatch extends question_type {
         return true;
     }
 
+    /**
+     * Saves the question options into the database.
+     *
+     * @param stdClass $question The question object.
+     * @return bool|stdClass True on success or an object with notices.
+     */
     public function save_question_options($question) {
         global $DB;
 
@@ -96,10 +105,10 @@ class qtype_ddmatch extends question_type {
                 $subquestion->id = $DB->insert_record('qtype_ddmatch_subquestions', $subquestion);
             }
             $subquestion->questiontext = $this->import_or_save_files($questiontext,
-                    $context, 'qtype_ddmatch', 'subquestion', $subquestion->id);
+            $context, 'qtype_ddmatch', 'subquestion', $subquestion->id);
             $subquestion->questiontextformat = $questiontext['format'];
             $subquestion->answertext = $this->import_or_save_files($question->subanswers[$key],
-                    $context, 'qtype_ddmatch', 'subanswer', $subquestion->id);
+            $context, 'qtype_ddmatch', 'subanswer', $subquestion->id);
             $subquestion->answertextformat = $question->subanswers[$key]['format'];
             $DB->update_record('qtype_ddmatch_subquestions', $subquestion);
         }
@@ -115,7 +124,6 @@ class qtype_ddmatch extends question_type {
             'qtype_ddmatch_options',
             ['questionid' => $question->id]
         );
-        
         if (!$options) {
             $options = new stdClass();
             $options->questionid = $question->id;
@@ -199,7 +207,7 @@ class qtype_ddmatch extends question_type {
 
                 $responses[$choiceid] = new question_possible_response(
                     $stemhtml . ': ' . $choicehtml,
-                        ($choiceid == $q->right[$stemid]) / count($q->stems));
+                ($choiceid == $q->right[$stemid]) / count($q->stems));
             }
             $responses[null] = question_possible_response::no_response();
 
@@ -252,7 +260,7 @@ class qtype_ddmatch extends question_type {
      * @param extra mixed any additional format specific data that may be passed by the format (see format code for info)
      * @return string the data to append to the output buffer or false if error
      */
-    public function export_to_xml($question, qformat_xml $format, $extra=null) {
+    public function export_to_xml($question, qformat_xml $format, $extra = null) {
         $expout = '';
         $fs = get_file_storage();
         $contextid = $question->contextid;

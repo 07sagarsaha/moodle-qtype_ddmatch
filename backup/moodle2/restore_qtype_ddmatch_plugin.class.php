@@ -15,16 +15,13 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * @package    qtype_ddmatch
+ * Restore plugin for the Drag-and-Drop Matching question type.
  *
- * @author DualCube <admin@dualcube.com>
+ * @package    qtype_ddmatch
+ * @author     DualCube <admin@dualcube.com>
  * @copyright  2007 DualCube (https://dualcube.com)
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
-
-defined('MOODLE_INTERNAL') || die();
-
 
 /**
  * Defines the restore plugin for the Drag-and-Drop Matching question type.
@@ -323,10 +320,17 @@ class restore_qtype_ddmatch_plugin extends restore_qtype_plugin {
             'qtype_ddmatch_subquestions',
             ['questiontext', 'answertext'],
             'qtype_ddmatch_subquestions'
-        );        
-
-        $fields = ['correctfeedback', 'partiallycorrectfeedback', 'incorrectfeedback'];
-        $contents[] = new restore_decode_content('qtype_ddmatch_options', $fields, 'qtype_ddmatch_options');
+        );
+        $fields = [
+            'correctfeedback',
+            'partiallycorrectfeedback',
+            'incorrectfeedback',
+        ];
+        $contents[] = new restore_decode_content(
+            'qtype_ddmatch_options',
+            $fields,
+            'qtype_ddmatch_options'
+        );
 
         return $contents;
     }

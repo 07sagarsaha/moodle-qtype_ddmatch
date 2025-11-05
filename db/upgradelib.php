@@ -18,21 +18,8 @@
  * Upgrade library code for the match question type.
  *
  * @package    qtype_ddmatch
- *
- * @author DualCube <admin@dualcube.com>
+ * @author     DualCube <admin@dualcube.com>
  * @copyright  2007 DualCube (https://dualcube.com)
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
-
-defined('MOODLE_INTERNAL') || die();
-
-/**
- * Class for converting attempt data for match questions when upgrading
- * attempts to the new question engine.
- *
- * This class is used by the code in question/engine/upgrade/upgradelib.php.
- *
- * @copyright  2010 The Open University
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class qtype_ddmatch_qe2_attempt_updater extends question_qtype_attempt_updater {
