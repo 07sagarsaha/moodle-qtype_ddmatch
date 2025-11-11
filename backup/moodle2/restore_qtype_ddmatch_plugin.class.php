@@ -208,7 +208,6 @@ class restore_qtype_ddmatch_plugin extends restore_qtype_plugin {
             if (isset($data->code)) {
                 $this->set_mapping('qtype_ddmatch_subquestion_codes', $data->code, $newitemid);
             }
-
         } else {
             // The ddmatch questions require mapping of qtype_ddmatch_subquestions, because
             // they are used by question_states->answer.
@@ -219,19 +218,29 @@ class restore_qtype_ddmatch_plugin extends restore_qtype_plugin {
                 $this->questionsubcache = [];
 
                 $params = ['question' => $newquestionid];
-                $potentialsubs = $DB->get_records('qtype_ddmatch_subquestions',
-                    ['questionid' => $newquestionid], '', 'id, questiontext, answertext');
+                $potentialsubs = $DB->get_records(
+                    'qtype_ddmatch_subquestions',
+                    ['questionid' => $newquestionid],
+                    '',
+                    'id, questiontext, answertext'
+                );
 
                 $this->questionsubcacheid = $newquestionid;
                 // Cache all cleaned answers and questiontext.
                 foreach ($potentialsubs as $potentialsub) {
                     // Clean in the same way than {@link xml_writer::xml_safe_utf8()}.
-                    $cleanquestion = preg_replace('/[\x-\x8\xb-\xc\xe-\x1f\x7f]/is',
-                            '', $potentialsub->questiontext); // Clean CTRL chars.
+                    $cleanquestion = preg_replace(
+                        '/[\x-\x8\xb-\xc\xe-\x1f\x7f]/is',
+                        '',
+                        $potentialsub->questiontext
+                    ); // Clean CTRL chars.
                     $cleanquestion = preg_replace("/\r\n|\r/", "\n", $cleanquestion); // Normalize line ending.
 
-                    $cleananswer = preg_replace('/[\x-\x8\xb-\xc\xe-\x1f\x7f]/is',
-                            '', $potentialsub->answertext); // Clean CTRL chars.
+                    $cleananswer = preg_replace(
+                        '/[\x-\x8\xb-\xc\xe-\x1f\x7f]/is',
+                        '',
+                        $potentialsub->answertext
+                    ); // Clean CTRL chars.
                     $cleananswer = preg_replace("/\r\n|\r/", "\n", $cleananswer); // Normalize line ending.
 
                     $this->questionsubcache[$cleanquestion][$cleananswer] = $potentialsub->id;

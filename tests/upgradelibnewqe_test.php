@@ -809,8 +809,10 @@ class upgradelibnewqe_test extends question_attempt_upgrader_test_base {
         $order = array_combine(array_values($order), array_keys($order));
         for ($i = 1; $i <= 5; $i++) {
             for ($sub = 0; $sub < 5; $sub++) {
-                if (!array_key_exists('sub' . $sub, $expectedqa->steps[$i]->data) ||
-                        $expectedqa->steps[$i]->data['sub' . $sub] == 0) {
+                if (
+                    !array_key_exists('sub' . $sub, $expectedqa->steps[$i]->data)
+                    ||$expectedqa->steps[$i]->data['sub' . $sub] == 0
+                ) {
                     continue;
                 }
                 $expectedqa->steps[$i]->data['sub' . $sub] =

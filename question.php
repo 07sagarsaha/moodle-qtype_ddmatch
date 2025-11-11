@@ -138,7 +138,7 @@ class qtype_ddmatch_question extends qtype_match_question {
         } else {
             return parent::check_file_access($qa, $options, $component, $filearea, $args, $forcedownload);
         }
-    }    
+    }
 
     /**
      * Returns the field name for a given stem key.

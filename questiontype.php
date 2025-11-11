@@ -85,8 +85,11 @@ class qtype_ddmatch extends question_type {
 
         $context = $question->context;
         $result = new stdClass();
-        $oldsubquestions = $DB->get_records('qtype_ddmatch_subquestions',
-            ['questionid' => $question->id], 'id ASC');
+        $oldsubquestions = $DB->get_records(
+            'qtype_ddmatch_subquestions',
+            ['questionid' => $question->id],
+            'id ASC'
+        );
         // Insert all the new question & answer pairs.
         foreach ($question->subquestions as $key => $questiontext) {
             if ($questiontext['text'] == '' && trim($question->subanswers[$key]['text']) == '') {
@@ -104,11 +107,21 @@ class qtype_ddmatch extends question_type {
                 $subquestion->answertext = '';
                 $subquestion->id = $DB->insert_record('qtype_ddmatch_subquestions', $subquestion);
             }
-            $subquestion->questiontext = $this->import_or_save_files($questiontext,
-            $context, 'qtype_ddmatch', 'subquestion', $subquestion->id);
+            $subquestion->questiontext = $this->import_or_save_files(
+                $questiontext,
+                $context,
+                'qtype_ddmatch',
+                'subquestion',
+                $subquestion->id
+            );
             $subquestion->questiontextformat = $questiontext['format'];
-            $subquestion->answertext = $this->import_or_save_files($question->subanswers[$key],
-            $context, 'qtype_ddmatch', 'subanswer', $subquestion->id);
+            $subquestion->answertext = $this->import_or_save_files(
+                $question->subanswers[$key],
+                $context,
+                'qtype_ddmatch',
+                'subanswer',
+                $subquestion->id
+            );
             $subquestion->answertextformat = $question->subanswers[$key]['format'];
             $DB->update_record('qtype_ddmatch_subquestions', $subquestion);
         }
@@ -142,6 +155,17 @@ class qtype_ddmatch extends question_type {
         return true;
     }
 
+    /**
+     * Initialise a question_definition instance using stored question data.
+     *
+     * Populates stems, choices, formats, and correct mappings from the DB records.
+     * Called automatically when a question instance is being prepared for use.
+     *
+     * @param question_definition $question The question instance to initialise.
+     * @param stdClass $questiondata The raw question data loaded from the database,
+     *                               including ->options and ->subquestions.
+     * @return void
+     */
     protected function initialise_question_instance(question_definition $question, $questiondata) {
         parent::initialise_question_instance($question, $questiondata);
 
@@ -174,10 +198,26 @@ class qtype_ddmatch extends question_type {
         }
     }
 
+    /**
+     * Create a hint object from a database record.
+     *
+     * @param stdClass $hint The hint data loaded from the database.
+     * @return question_hint_with_parts A hint object with parts support.
+     */
     protected function make_hint($hint) {
         return question_hint_with_parts::load_from_record($hint);
     }
 
+    /**
+     * Delete all data related to this question type.
+     *
+     * Removes ddmatch-specific records from the database and then
+     * calls the parent method to handle core cleanup.
+     *
+     * @param int $questionid The ID of the question being deleted.
+     * @param int $contextid The context ID where the question files are stored.
+     * @return void
+     */
     public function delete_question($questionid, $contextid) {
         global $DB;
 
@@ -187,11 +227,30 @@ class qtype_ddmatch extends question_type {
         parent::delete_question($questionid, $contextid);
     }
 
+    /**
+     * Calculate the random guess score for the question.
+     *
+     * Makes a temporary question instance and returns the probability
+     * of guessing a correct answer at random.
+     *
+     * @param object $questiondata The question definition data from the database.
+     * @return float Random guess score between 0 and 1.
+     */
     public function get_random_guess_score($questiondata) {
         $q = $this->make_question($questiondata);
         return 1 / count($q->choices);
     }
 
+    /**
+     * Get the list of possible responses for each stem in the question.
+     *
+     * Builds a matrix of all possible (stem → choice) responses. Each stem
+     * will have a list of `question_possible_response` objects representing
+     * each choice the user can select.
+     *
+     * @param object $questiondata The question definition as loaded from the database.
+     * @return array An array indexed by stem id, each containing an array of possible responses.
+     */
     public function get_possible_responses($questiondata) {
         $subqs = [];
 
@@ -207,7 +266,8 @@ class qtype_ddmatch extends question_type {
 
                 $responses[$choiceid] = new question_possible_response(
                     $stemhtml . ': ' . $choicehtml,
-                ($choiceid == $q->right[$stemid]) / count($q->stems));
+                    ($choiceid == $q->right[$stemid]) / count($q->stems)
+                );
             }
             $responses[null] = question_possible_response::no_response();
 
@@ -217,33 +277,75 @@ class qtype_ddmatch extends question_type {
         return $subqs;
     }
 
+    /**
+     * Moves all files associated with a question to a new context.
+     *
+     * This includes files stored in the 'subquestion' and 'subanswer' file areas,
+     * as well as files belonging to combined feedback and hints. The operation
+     * delegates core file movement to the parent implementation before handling
+     * subquestion-specific file areas.
+     *
+     * @param int $questionid The ID of the question whose files are being moved.
+     * @param int $oldcontextid The original context ID.
+     * @param int $newcontextid The destination context ID.
+     * @return void
+     */
     public function move_files($questionid, $oldcontextid, $newcontextid) {
         global $DB;
         $fs = get_file_storage();
 
         parent::move_files($questionid, $oldcontextid, $newcontextid);
 
-        $subquestionids = $DB->get_records_menu('qtype_ddmatch_subquestions',
-            ['questionid' => $questionid], 'id', 'id,1');
+        $subquestionids = $DB->get_records_menu(
+            'qtype_ddmatch_subquestions',
+            ['questionid' => $questionid],
+            'id',
+            'id,1'
+        );
         foreach ($subquestionids as $subquestionid => $notused) {
-            $fs->move_area_files_to_new_context($oldcontextid,
-                    $newcontextid, 'qtype_ddmatch', 'subquestion', $subquestionid);
-            $fs->move_area_files_to_new_context($oldcontextid,
-                    $newcontextid, 'qtype_ddmatch', 'subanswer', $subquestionid);
+            $fs->move_area_files_to_new_context(
+                $oldcontextid,
+                $newcontextid,
+                'qtype_ddmatch',
+                'subquestion',
+                $subquestionid
+            );
+            $fs->move_area_files_to_new_context(
+                $oldcontextid,
+                $newcontextid,
+                'qtype_ddmatch',
+                'subanswer',
+                $subquestionid
+            );
         }
 
         $this->move_files_in_combined_feedback($questionid, $oldcontextid, $newcontextid);
         $this->move_files_in_hints($questionid, $oldcontextid, $newcontextid);
     }
 
+    /**
+     * Deletes all files associated with a question and its subquestions.
+     *
+     * This includes files stored under 'subquestion' and 'subanswer' file areas,
+     * and also delegates deletion of combined feedback and hint files to parent class
+     * helper methods.
+     *
+     * @param int $questionid The ID of the question whose files should be deleted.
+     * @param int $contextid The context ID where these files are stored.
+     * @return void
+     */
     protected function delete_files($questionid, $contextid) {
         global $DB;
         $fs = get_file_storage();
 
         parent::delete_files($questionid, $contextid);
 
-        $subquestionids = $DB->get_records_menu('qtype_ddmatch_subquestions',
-            ['questionid' => $questionid], 'id', 'id,1');
+        $subquestionids = $DB->get_records_menu(
+            'qtype_ddmatch_subquestions',
+            ['questionid' => $questionid],
+            'id',
+            'id,1'
+        );
         foreach ($subquestionids as $subquestionid => $notused) {
             $fs->delete_area_files($contextid, 'qtype_ddmatch', 'subquestion', $subquestionid);
             $fs->delete_area_files($contextid, 'qtype_ddmatch', 'subanswer', $subquestionid);
@@ -267,17 +369,19 @@ class qtype_ddmatch extends question_type {
         $expout .= "    <shuffleanswers>" .
                 $format->get_single($question->options->shuffleanswers) .
                 "</shuffleanswers>\n";
-        $expout .= $format->write_combined_feedback($question->options,
-                                                    $question->id,
-                                                    $question->contextid);
+        $expout .= $format->write_combined_feedback(
+            $question->options,
+            $question->id,
+            $question->contextid
+        );
         foreach ($question->options->subquestions as $subquestion) {
             $files = $fs->get_area_files($contextid, 'qtype_ddmatch', 'subquestion', $subquestion->id);
             $textformat = $format->get_format($subquestion->questiontextformat);
             $expout .= "    <subquestion format=\"$textformat\">\n";
-            $expout .= '      ' . $format->writetext( $subquestion->questiontext );
+            $expout .= '      ' . $format->writetext($subquestion->questiontext);
             $expout .= '      ' . $format->write_files($files, 2);
             $expout .= "       <answer format=\"$textformat\">\n";
-            $expout .= '      ' . $format->writetext( $subquestion->answertext );
+            $expout .= '      ' . $format->writetext($subquestion->answertext);
             $files = $fs->get_area_files($contextid, 'qtype_ddmatch', 'subanswer', $subquestion->id);
             $expout .= '      ' . $format->write_files($files, 2);
             $expout .= "       </answer>\n";
@@ -295,7 +399,7 @@ class qtype_ddmatch extends question_type {
      * @param $extra mixed any additional format specific data that may be passed by the format (see format code for info)
      * @return object question object suitable for save_options() call or false if cannot handle
      */
-    public function import_from_xml($xml, $fromform, qformat_xml $format, $extra=null) {
+    public function import_from_xml($xml, $fromform, qformat_xml $format, $extra = null) {
         // Check question is for us.
         $qtype = $xml['@']['type'];
         if ($qtype == 'ddmatch') {
@@ -303,19 +407,32 @@ class qtype_ddmatch extends question_type {
 
             // Header parts particular to ddmatch qtype.
             $fromform->qtype = $this->name();
-            $fromform->shuffleanswers = $format->trans_single($format->getpath($xml,
-                ['#', 'shuffleanswers', 0, '#'], 1));
+            $fromform->shuffleanswers = $format->trans_single(
+                $format->getpath(
+                    $xml,
+                    ['#', 'shuffleanswers', 0, '#'],
+                    1
+                )
+            );
 
             // Run through subquestions.
             $fromform->subquestions = [];
             $fromform->subanswers = [];
             foreach ($xml['#']['subquestion'] as $subqxml) {
-                $fromform->subquestions[] = $format->import_text_with_files($subqxml,
-                    [], '', $format->get_format($fromform->questiontextformat));
+                $fromform->subquestions[] = $format->import_text_with_files(
+                    $subqxml,
+                    [],
+                    '',
+                    $format->get_format($fromform->questiontextformat)
+                );
 
                 $answers = $format->getpath($subqxml, ['#', 'answer', 0], []);
-                $fromform->subanswers[] = $format->import_text_with_files($answers,
-                    [], '', $format->get_format($fromform->questiontextformat));
+                $fromform->subanswers[] = $format->import_text_with_files(
+                    $answers,
+                    [],
+                    '',
+                    $format->get_format($fromform->questiontextformat)
+                );
             }
 
             $format->import_combined_feedback($fromform, $xml, true);

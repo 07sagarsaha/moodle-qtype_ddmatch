@@ -78,7 +78,7 @@ class walkthrough_test extends qbehaviour_walkthrough_test_base {
             'sub0' => '0',
             'sub1' => '0',
             'sub2' => '0',
-            'sub3' => '0'
+            'sub3' => '0',
         ]);
 
         // Verify.
@@ -138,7 +138,7 @@ class walkthrough_test extends qbehaviour_walkthrough_test_base {
             'sub0' => $orderforchoice[1],
             'sub1' => $orderforchoice[2],
             'sub2' => '0',
-            'sub3' => '0'
+            'sub3' => '0',
         ]);
 
         // Verify.
@@ -204,7 +204,7 @@ class walkthrough_test extends qbehaviour_walkthrough_test_base {
             'sub0' => $orderforchoice[1],
             'sub1' => $orderforchoice[2],
             'sub2' => $orderforchoice[2],
-            'sub3' => $orderforchoice[1]
+            'sub3' => $orderforchoice[1],
         ]);
 
         // Finish the attempt without clicking check.
@@ -260,7 +260,7 @@ class walkthrough_test extends qbehaviour_walkthrough_test_base {
             'sub0' => $orderforchoice[1],
             'sub1' => $orderforchoice[2],
             'sub2' => $orderforchoice[1],
-            'sub3' => '0'
+            'sub3' => '0',
         ]);
 
         // Finish the attempt without clicking check.
@@ -317,7 +317,7 @@ class walkthrough_test extends qbehaviour_walkthrough_test_base {
             'sub1' => '0',
             'sub2' => '0',
             'sub3' => '0',
-            '-submit' => '1'
+            '-submit' => '1',
         ]);
 
         // Verify.
@@ -340,7 +340,7 @@ class walkthrough_test extends qbehaviour_walkthrough_test_base {
             'sub1' => $orderforchoice[2],
             'sub2' => $orderforchoice[2],
             'sub3' => $orderforchoice[1],
-            '-submit' => '1'
+            '-submit' => '1',
         ]);
 
         // Verify.
@@ -396,7 +396,7 @@ class walkthrough_test extends qbehaviour_walkthrough_test_base {
         $rightresponse = [
             'sub0' => $orderforchoice[1],
             'sub1' => $orderforchoice[2],
-            'sub2' => $orderforchoice[3]
+            'sub2' => $orderforchoice[3],
         ];
         $rightresponsesummary =
             '(1, 2] -> 1 < x ≤ 2; [1, 2] -> 1 ≤ x ≤ 2; [1, 2) -> 1 ≤ x < 2';
@@ -451,7 +451,7 @@ class walkthrough_test extends qbehaviour_walkthrough_test_base {
             'sub1' => $orderforchoice[3],
             'sub2' => $orderforchoice[3],
             'sub3' => $orderforchoice[3],
-            '-submit' => 1
+            '-submit' => 1,
         ]);
 
         // Verify.
@@ -463,16 +463,20 @@ class walkthrough_test extends qbehaviour_walkthrough_test_base {
             $this->get_contains_select_expectation('sub2', $choices, $orderforchoice[3], false),
             $this->get_contains_select_expectation('sub3', $choices, $orderforchoice[3], false),
             $this->get_contains_hidden_expectation(
-                $this->quba->get_field_prefix($this->slot) . 'sub0', '0'
+                $this->quba->get_field_prefix($this->slot) . 'sub0',
+                '0'
             ),
             $this->get_contains_hidden_expectation(
-                $this->quba->get_field_prefix($this->slot) . 'sub1', '0'
+                $this->quba->get_field_prefix($this->slot) . 'sub1',
+                '0'
             ),
             $this->get_contains_hidden_expectation(
-                $this->quba->get_field_prefix($this->slot) . 'sub2', '0'
+                $this->quba->get_field_prefix($this->slot) . 'sub2',
+                '0'
             ),
             $this->get_contains_hidden_expectation(
-                $this->quba->get_field_prefix($this->slot) . 'sub3', '0'
+                $this->quba->get_field_prefix($this->slot) . 'sub3',
+                '0'
             ),
             $this->get_does_not_contain_submit_button_expectation(),
             $this->get_contains_hint_expectation('This is the first hint.')
@@ -484,7 +488,7 @@ class walkthrough_test extends qbehaviour_walkthrough_test_base {
             'sub1' => 0,
             'sub2' => 0,
             'sub3' => 0,
-            '-tryagain' => 1
+            '-tryagain' => 1,
         ]);
 
         // Verify.
@@ -507,7 +511,7 @@ class walkthrough_test extends qbehaviour_walkthrough_test_base {
             'sub1' => $orderforchoice[3],
             'sub2' => $orderforchoice[2],
             'sub3' => $orderforchoice[1],
-            '-submit' => 1
+            '-submit' => 1,
         ]);
 
         // Verify.
@@ -519,16 +523,20 @@ class walkthrough_test extends qbehaviour_walkthrough_test_base {
             $this->get_contains_select_expectation('sub2', $choices, $orderforchoice[2], false),
             $this->get_contains_select_expectation('sub3', $choices, $orderforchoice[1], false),
             $this->get_contains_hidden_expectation(
-                $this->quba->get_field_prefix($this->slot) . 'sub0', '0'
+                $this->quba->get_field_prefix($this->slot) . 'sub0',
+                '0'
             ),
             $this->get_contains_hidden_expectation(
-                $this->quba->get_field_prefix($this->slot) . 'sub1', '0'
+                $this->quba->get_field_prefix($this->slot) . 'sub1',
+                '0'
             ),
             $this->get_contains_hidden_expectation(
-                $this->quba->get_field_prefix($this->slot) . 'sub2', $orderforchoice[2]
+                $this->quba->get_field_prefix($this->slot) . 'sub2',
+                $orderforchoice[2]
             ),
             $this->get_contains_hidden_expectation(
-                $this->quba->get_field_prefix($this->slot) . 'sub3', $orderforchoice[1]
+                $this->quba->get_field_prefix($this->slot) . 'sub3',
+                $orderforchoice[1]
             ),
             $this->get_does_not_contain_submit_button_expectation(),
             $this->get_contains_hint_expectation('This is the second hint.')
@@ -540,7 +548,7 @@ class walkthrough_test extends qbehaviour_walkthrough_test_base {
             'sub1' => 0,
             'sub2' => $orderforchoice[2],
             'sub3' => $orderforchoice[1],
-            '-tryagain' => 1
+            '-tryagain' => 1,
         ]);
 
         // Verify.

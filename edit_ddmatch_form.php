@@ -48,9 +48,12 @@ class qtype_ddmatch_edit_form extends question_edit_form {
         &$repeatedoptions,
         &$answersoption
     ) {
-        $mform->addElement('static', 'answersinstruct',
-                get_string('availablechoices', 'qtype_match'),
-                get_string('filloutthreeqsandtwoas', 'qtype_match'));
+        $mform->addElement(
+            'static', 
+            'answersinstruct',
+            get_string('availablechoices', 'qtype_match'),
+            get_string('filloutthreeqsandtwoas', 'qtype_match')
+        );
 
         $repeated = [];
         $repeated[] = $mform->createElement(
@@ -131,7 +134,7 @@ class qtype_ddmatch_edit_form extends question_edit_form {
                 $this->context->id, // Context.
                 'qtype_ddmatch', // Component.
                 'subquestion', // Filarea.
-                !empty($subquestion->id) ? (int) $subquestion->id : null, // itemid
+                !empty($subquestion->id) ? (int) $subquestion->id : null, // Itemid.
                 $this->fileoptions, // Options.
                 $subquestion->questiontext // Text.
             );
@@ -145,7 +148,7 @@ class qtype_ddmatch_edit_form extends question_edit_form {
                 $this->context->id, // Context.
                 'qtype_ddmatch', // Component.
                 'subanswer', // Filarea.
-                !empty($subquestion->id) ? (int) $subquestion->id : null, // itemid
+                !empty($subquestion->id) ? (int) $subquestion->id : null, // Itemid.
                 $this->fileoptions, // Options.
                 $subquestion->answertext // Text.
             );
