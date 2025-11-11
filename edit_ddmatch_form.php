@@ -49,7 +49,7 @@ class qtype_ddmatch_edit_form extends question_edit_form {
         &$answersoption
     ) {
         $mform->addElement(
-            'static', 
+            'static',
             'answersinstruct',
             get_string('availablechoices', 'qtype_match'),
             get_string('filloutthreeqsandtwoas', 'qtype_match')

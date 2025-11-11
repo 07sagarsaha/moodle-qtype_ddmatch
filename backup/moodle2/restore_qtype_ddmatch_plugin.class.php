@@ -137,6 +137,7 @@ class restore_qtype_ddmatch_plugin extends restore_qtype_plugin {
 
     /**
      * Process the qtype/matchoptions element.
+     * @param array $data
      */
     public function process_matchoptions($data) {
         global $DB;
@@ -183,6 +184,7 @@ class restore_qtype_ddmatch_plugin extends restore_qtype_plugin {
 
     /**
      * Process the qtype/matches/match element.
+     * @param array $data
      */
     public function process_match($data) {
         global $DB;
@@ -228,7 +230,7 @@ class restore_qtype_ddmatch_plugin extends restore_qtype_plugin {
                 $this->questionsubcacheid = $newquestionid;
                 // Cache all cleaned answers and questiontext.
                 foreach ($potentialsubs as $potentialsub) {
-                    // Clean in the same way than {@link xml_writer::xml_safe_utf8()}.
+                    // Clean in the same way as {@see xml_writer::xml_safe_utf8()}.
                     $cleanquestion = preg_replace(
                         '/[\x-\x8\xb-\xc\xe-\x1f\x7f]/is',
                         '',
@@ -276,12 +278,20 @@ class restore_qtype_ddmatch_plugin extends restore_qtype_plugin {
     }
 
     /**
-     * Given one question_states record, return the answer
-     * recoded pointing to all the restored stuff for ddmatch questions.
+     * Given one question_states record, return the recoded answer for restored ddmatch questions.
      *
-     * answer is one comma separated list of hypen separated pairs
-     * containing question_ddmatch_sub->id and question_ddmatch_sub->code, which
-     * has been remapped to be qtype_ddmatch_subquestions->id, since code no longer exists.
+     * The legacy answer format is a comma-separated list of hyphen-separated pairs,
+     * where each pair represents:
+     *     - question_ddmatch_sub->id
+     *     - question_ddmatch_sub->code
+     *
+     * During restore, the IDs are remapped so the function returns a new
+     * comma-separated list where:
+     *     - the old question_ddmatch_sub.id is mapped to qtype_ddmatch_subquestions->id
+     *     - the old code is mapped to qtype_ddmatch_subquestion_codes->id
+     *
+     * @param \stdClass $state A question_states record containing the legacy answer field
+     * @return string The recoded answer string with updated IDs
      */
     public function recode_legacy_state_answer($state) {
         $answer = $state->answer;

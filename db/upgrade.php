@@ -21,10 +21,8 @@
  * plugin whenever its version number increases.
  *
  * @package    qtype_ddmatch
- *
- * @author DualCube <admin@dualcube.com>
- * @copyright  2007 DualCube (https://dualcube.com)
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @param int $oldversion The version we are upgrading from
+ * @return bool Always returns true on success
  */
 function xmldb_qtype_ddmatch_upgrade($oldversion) {
     global $CFG, $DB;

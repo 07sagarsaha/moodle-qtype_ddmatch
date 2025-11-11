@@ -573,11 +573,13 @@ class upgradelibnewqe_test extends question_attempt_upgrader_test_base {
             'generalfeedback' => '<ul>
             <li>Subject gateways provide links to sites that have been quality checked = True </li>
  </ul>
- <p>All links in a subject gateway have been added by a knowledgeable subject specialist and so have to be of a certain quality to be added to the collection.</p>
+ <p>All links in a subject gateway have been added by 
+ knowledgeable subject specialist and so have to be of a certain quality to be added to the collection.</p>
  <ul>
             <li>Subject gateways offer more variety than search engines = False </li>
  </ul>
- <p>Subject gateways will most likely provide fewer links than a search engine, but this is because they are selected with a particular subject area in mind </p>
+ <p>Subject gateways will most likely provide fewer links than a search engine,
+ but this is because they are selected with a particular subject area in mind </p>
  <ul>
             <li>Subject gateways index websites automatically = False </li>
  </ul>
@@ -585,7 +587,8 @@ class upgradelibnewqe_test extends question_attempt_upgrader_test_base {
  <ul>
             <li>Subject gateways can provide a more direct route to websites containing academic content = True </li>
  </ul>
- <p>All links in a subject gateway have been added by a knowledgeable subject specialist and so you can find academic content easier than using a web search engine.</p>',
+ <p>All links in a subject gateway have been added by a knowledgeable subject
+ specialist and so you can find academic content easier than using a web search engine.</p>',
             'generalfeedbackformat' => '1',
             'timecreated' => '0',
             'timemodified' => '0',
@@ -811,7 +814,7 @@ class upgradelibnewqe_test extends question_attempt_upgrader_test_base {
             for ($sub = 0; $sub < 5; $sub++) {
                 if (
                     !array_key_exists('sub' . $sub, $expectedqa->steps[$i]->data)
-                    ||$expectedqa->steps[$i]->data['sub' . $sub] == 0
+                    || $expectedqa->steps[$i]->data['sub' . $sub] == 0
                 ) {
                     continue;
                 }

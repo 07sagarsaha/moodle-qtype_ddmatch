@@ -356,11 +356,12 @@ class qtype_ddmatch extends question_type {
     }
 
     /**
-     * Provide export functionality for xml format
-     * @param question object the question object
-     * @param format object the format object so that helper methods can be used
-     * @param extra mixed any additional format specific data that may be passed by the format (see format code for info)
-     * @return string the data to append to the output buffer or false if error
+     * Export the question to the given format.
+     *
+     * @param object $question The question being exported.
+     * @param qformat_xml $format The format object being used to export the question.
+     * @param object $extra Any additional information required for export.
+     * @return string The XML representation of the question.
      */
     public function export_to_xml($question, qformat_xml $format, $extra = null) {
         $expout = '';
