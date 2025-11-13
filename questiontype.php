@@ -393,12 +393,12 @@ class qtype_ddmatch extends question_type {
     }
 
     /**
-     * Provide import functionality for xml format
-     * @param $xml mixed the segment of data containing the question
-     * @param $fromform object question object processed (so far) by standard import code
-     * @param qformat_xml $format the format object being used to import the question
-     * @param $extra mixed any additional format specific data that may be passed by the format (see format code for info)
-     * @return object question object suitable for save_options() call or false if cannot handle
+     * Provide import functionality for xml format.
+     * @param array $xml The question data in XML format.
+     * @param object $fromform The question data in form format.
+     * @param qformat_xml $format The format object being used to import the question.
+     * @param object $extra Any additional information required for import.
+     * @return object The imported question data.
      */
     public function import_from_xml($xml, $fromform, qformat_xml $format, $extra = null) {
         // Check question is for us.
