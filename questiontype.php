@@ -396,7 +396,7 @@ class qtype_ddmatch extends question_type {
      * Provide import functionality for xml format
      * @param $xml mixed the segment of data containing the question
      * @param $fromform object question object processed (so far) by standard import code
-     * @param $format object the format object so that helper methods can be used (in particular error() )
+     * @param qformat_xml $format the format object being used to import the question
      * @param $extra mixed any additional format specific data that may be passed by the format (see format code for info)
      * @return object question object suitable for save_options() call or false if cannot handle
      */

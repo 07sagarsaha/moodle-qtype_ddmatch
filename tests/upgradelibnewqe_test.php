@@ -573,7 +573,7 @@ class upgradelibnewqe_test extends question_attempt_upgrader_test_base {
             'generalfeedback' => '<ul>
             <li>Subject gateways provide links to sites that have been quality checked = True </li>
  </ul>
- <p>All links in a subject gateway have been added by 
+ <p>All links in a subject gateway have been added by
  knowledgeable subject specialist and so have to be of a certain quality to be added to the collection.</p>
  <ul>
             <li>Subject gateways offer more variety than search engines = False </li>

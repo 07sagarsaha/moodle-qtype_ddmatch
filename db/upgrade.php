@@ -15,6 +15,15 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
+ * Upgrade code for the match question type.
+ *
+ * @package    qtype_ddmatch
+ * @author     DualCube <admin@dualcube.com>
+ * @copyright  2007 DualCube (https://dualcube.com)
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
+/**
  * Upgrade script for the Drag-and-Drop Matching question type plugin.
  *
  * This function performs database schema and data upgrades for the qtype_ddmatch

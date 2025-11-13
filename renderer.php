@@ -92,7 +92,7 @@ class qtype_ddmatch_renderer extends qtype_with_combined_feedback_renderer {
     /**
      * Generate the HTML required for the specific feedback
      *
-     * @param question_attempt qa
+     * @param question_attempt $qa
      */
     public function specific_feedback(question_attempt $qa) {
         return $this->combined_feedback($qa);
@@ -101,7 +101,7 @@ class qtype_ddmatch_renderer extends qtype_with_combined_feedback_renderer {
     /**
      * Generate the HTML required for the correct response
      *
-     * @param question_attempt qa
+     * @param question_attempt $qa
      */
     public function correct_response(question_attempt $qa) {
         if ($qa->get_state()->is_correct()) {
@@ -167,7 +167,7 @@ class qtype_ddmatch_renderer extends qtype_with_combined_feedback_renderer {
         foreach ($stemorder as $key => $stemid) {
             $o .= html_writer::start_tag('tr', ['class' => 'r' . $parity]);
             $o .= html_writer::tag(
-                'td', 
+                'td',
                 $this->construct_stem_cell($qa, $question, $stemid),
                 ['class' => 'text dragdrop-question']
             );
@@ -274,7 +274,7 @@ class qtype_ddmatch_renderer extends qtype_with_combined_feedback_renderer {
 
             $attributes = [
                 'data-id' => $selected,
-                'class' => 'matchdrag copy'
+                'class' => 'matchdrag copy',
             ];
             $li = html_writer::tag('li', $choices[$selected], $attributes);
 
